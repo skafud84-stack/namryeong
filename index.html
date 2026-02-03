@@ -43,13 +43,12 @@
         }
 
         header h1 {
-              font-size: 3rem;
-              font-weight: 700;
-              letter-spacing: 1px;
-              line-height: 1;
-              margin-bottom: 15px;
-         }
-
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            line-height: 1;
+            margin-bottom: 15px;
+        }
 
         header p {
             color: #888;
@@ -57,7 +56,35 @@
             font-weight: 300;
         }
 
-        /* 업로드 버튼 */
+        /* 관리자 로그인 버튼 */
+        .admin-login-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background: transparent;
+            border: 1px solid #333;
+            color: #666;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: 'GmarketSans', sans-serif;
+            transition: all 0.3s ease;
+            z-index: 9998;
+        }
+
+        .admin-login-btn:hover {
+            border-color: #ff2d55;
+            color: #ff2d55;
+        }
+
+        .admin-login-btn.logged-in {
+            background: #ff2d55;
+            border-color: #ff2d55;
+            color: #fff;
+        }
+
+        /* 업로드 버튼 - 관리자만 보임 */
         .add-btn {
             position: fixed;
             bottom: 30px;
@@ -73,11 +100,15 @@
             cursor: pointer;
             box-shadow: 0 4px 20px rgba(255, 45, 85, 0.5);
             z-index: 9999;
-            display: flex;
+            display: none;
             align-items: center;
             justify-content: center;
             line-height: 1;
             transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .add-btn.visible {
+            display: flex;
         }
 
         .add-btn:hover {
@@ -221,7 +252,7 @@
             font-weight: 300;
         }
 
-        /* 삭제 버튼 */
+        /* 삭제 버튼 - 관리자만 보임 */
         .delete-btn {
             position: absolute;
             top: 12px;
@@ -237,9 +268,14 @@
             opacity: 0;
             transform: scale(0.8);
             transition: all 0.3s ease;
+            display: none;
         }
 
-        .card:hover .delete-btn {
+        .delete-btn.visible {
+            display: block;
+        }
+
+        .card:hover .delete-btn.visible {
             opacity: 1;
             transform: scale(1);
         }
@@ -358,8 +394,13 @@
             font-weight: 300;
         }
 
+        .btn-group {
+            display: flex;
+            gap: 10px;
+        }
+
         .copy-btn {
-            width: 100%;
+            flex: 1;
             padding: 16px;
             background: #fff;
             color: #000;
@@ -370,8 +411,6 @@
             cursor: pointer;
             font-family: 'GmarketSans', sans-serif;
             transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
         }
 
         .copy-btn:hover {
@@ -386,6 +425,16 @@
         .copy-btn.copied {
             background: #22c55e;
             color: #fff;
+        }
+
+        .edit-btn {
+            background: #ff2d55;
+            color: #fff;
+            display: none;
+        }
+
+        .edit-btn:hover {
+            box-shadow: 0 10px 20px rgba(255, 45, 85, 0.4);
         }
 
         .modal-close {
@@ -410,7 +459,7 @@
             transform: rotate(90deg);
         }
 
-        /* 업로드 모달 */
+        /* 업로드/수정 모달 */
         .upload-modal {
             max-width: 500px;
         }
@@ -524,6 +573,46 @@
             transform: scale(0.98);
         }
 
+        /* 로그인 모달 */
+        .login-modal {
+            max-width: 400px;
+        }
+
+        .login-modal .modal-content {
+            padding: 40px;
+            text-align: center;
+        }
+
+        .login-modal h2 {
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .login-modal input {
+            width: 100%;
+            padding: 14px;
+            background: #0a0a0a;
+            border: 1px solid #333;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'GmarketSans', sans-serif;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .login-modal input:focus {
+            outline: none;
+            border-color: #ff2d55;
+        }
+
+        .login-error {
+            color: #ff4757;
+            font-size: 0.85rem;
+            margin-bottom: 15px;
+            display: none;
+        }
+
         /* 빈 상태 */
         .empty-state {
             text-align: center;
@@ -553,19 +642,30 @@
                 font-size: 2rem;
             }
             .modal-overlay { padding: 20px; }
+            .admin-login-btn {
+                top: 15px;
+                right: 15px;
+                padding: 8px 15px;
+                font-size: 0.75rem;
+            }
+            .btn-group {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- 업로드 버튼 -->
-    <button class="add-btn" onclick="openUploadModal()">+</button>
+    <!-- 관리자 로그인 버튼 -->
+    <button class="admin-login-btn" id="adminLoginBtn" onclick="toggleAdminLogin()">Admin</button>
+
+    <!-- 업로드 버튼 (관리자만) -->
+    <button class="add-btn" id="addBtn" onclick="openUploadModal()">+</button>
 
     <header>
         <h1>NAMRYUNG<br>PROMPT</h1>
         <p>AI Image Prompt Library</p>
     </header>
-
 
     <nav class="filter-nav">
         <button class="filter-btn active" data-filter="all">All</button>
@@ -589,7 +689,10 @@
                 <div class="modal-category" id="modalCategory"></div>
                 <h2 class="modal-title" id="modalTitle"></h2>
                 <div class="modal-prompt" id="modalPrompt"></div>
-                <button class="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
+                <div class="btn-group">
+                    <button class="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
+                    <button class="copy-btn edit-btn" id="editBtn" onclick="openEditModal()">Edit</button>
+                </div>
             </div>
         </div>
     </div>
@@ -637,11 +740,73 @@
         </div>
     </div>
 
+    <!-- 수정 모달 -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal upload-modal">
+            <button class="modal-close" onclick="closeModal('editModal')">×</button>
+            <div class="modal-content">
+                <h2>프롬프트 수정</h2>
+                
+                <div class="form-group">
+                    <label>이미지</label>
+                    <div class="image-upload" id="editImageUpload">
+                        <input type="file" id="editImageInput" accept="image/*" hidden onchange="handleEditImageUpload(event)">
+                        <p class="image-upload-text">클릭해서 이미지 변경<br><span>또는 드래그 앤 드롭</span></p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>카테고리</label>
+                    <select id="editCategory">
+                        <option value="fashion">Fashion</option>
+                        <option value="product">Product</option>
+                        <option value="concept">Concept Art</option>
+                        <option value="photo">Photography</option>
+                        <option value="typography">Typography</option>
+                        <option value="illustration">Illustration</option>
+                        <option value="texture">Texture</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>제목</label>
+                    <input type="text" id="editTitle" placeholder="프롬프트 제목 입력">
+                </div>
+
+                <div class="form-group">
+                    <label>프롬프트</label>
+                    <textarea id="editPrompt" placeholder="프롬프트 내용 입력"></textarea>
+                </div>
+
+                <button class="submit-btn" onclick="saveEdit()">수정 완료</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 로그인 모달 -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal login-modal">
+            <button class="modal-close" onclick="closeModal('loginModal')">×</button>
+            <div class="modal-content">
+                <h2>🔐 Admin Login</h2>
+                <p class="login-error" id="loginError">비밀번호가 틀렸습니다</p>
+                <input type="password" id="adminPassword" placeholder="비밀번호 입력" onkeypress="handleLoginKeypress(event)">
+                <button class="submit-btn" onclick="adminLogin()">로그인</button>
+            </div>
+        </div>
+    </div>
+
     <script>
-        // 로컬스토리지에서 데이터 불러오기
+        // ⭐ 관리자 비밀번호 설정 (원하는 걸로 바꿔!)
+        const ADMIN_PASSWORD = 'namryung123';
+
+        // 상태 변수
+        let isAdmin = false;
         let promptData = JSON.parse(localStorage.getItem('promptData')) || [];
         let uploadedImage = '';
         let currentPrompt = '';
+        let editingId = null;
+        let editedImage = '';
 
         // 카테고리 한글 매핑
         const categoryNames = {
@@ -659,6 +824,57 @@
             localStorage.setItem('promptData', JSON.stringify(promptData));
         }
 
+        // 관리자 로그인 토글
+        function toggleAdminLogin() {
+            if (isAdmin) {
+                isAdmin = false;
+                updateAdminUI();
+            } else {
+                document.getElementById('loginModal').classList.add('active');
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('loginError').style.display = 'none';
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        // 로그인 처리
+        function adminLogin() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                closeModal('loginModal');
+                updateAdminUI();
+                renderGallery();
+            } else {
+                document.getElementById('loginError').style.display = 'block';
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+
+        // 엔터키 로그인
+        function handleLoginKeypress(event) {
+            if (event.key === 'Enter') {
+                adminLogin();
+            }
+        }
+
+        // 관리자 UI 업데이트
+        function updateAdminUI() {
+            const loginBtn = document.getElementById('adminLoginBtn');
+            const addBtn = document.getElementById('addBtn');
+
+            if (isAdmin) {
+                loginBtn.textContent = 'Logout';
+                loginBtn.classList.add('logged-in');
+                addBtn.classList.add('visible');
+            } else {
+                loginBtn.textContent = 'Admin';
+                loginBtn.classList.remove('logged-in');
+                addBtn.classList.remove('visible');
+            }
+            renderGallery();
+        }
+
         // 갤러리 렌더링
         function renderGallery(filter = 'all') {
             const gallery = document.getElementById('gallery');
@@ -670,7 +886,7 @@
                 gallery.innerHTML = `
                     <div class="empty-state" style="grid-column: 1/-1;">
                         <p>아직 등록된 프롬프트가 없어요</p>
-                        <p style="font-size: 0.9rem; font-weight: 300;">오른쪽 아래 + 버튼으로 추가해보세요!</p>
+                        <p style="font-size: 0.9rem; font-weight: 300;">${isAdmin ? '+ 버튼으로 추가해보세요!' : '곧 업데이트 예정!'}</p>
                     </div>
                 `;
                 return;
@@ -678,7 +894,7 @@
 
             gallery.innerHTML = filtered.map((item, index) => `
                 <div class="card" style="animation-delay: ${index * 0.1}s" onclick="openViewModal(${item.id})">
-                    <button class="delete-btn" onclick="event.stopPropagation(); deletePrompt(${item.id})">×</button>
+                    <button class="delete-btn ${isAdmin ? 'visible' : ''}" onclick="event.stopPropagation(); deletePrompt(${item.id})">×</button>
                     <img class="card-image" src="${item.image}" alt="${item.title}">
                     <div class="card-content">
                         <div class="card-category">${categoryNames[item.category] || item.category}</div>
@@ -707,11 +923,88 @@
             document.getElementById('modalPrompt').textContent = item.prompt;
             document.getElementById('viewModal').classList.add('active');
             currentPrompt = item.prompt;
+            editingId = id;
+            
+            // 관리자면 Edit 버튼 보이기
+            document.getElementById('editBtn').style.display = isAdmin ? 'block' : 'none';
+            
             document.body.style.overflow = 'hidden';
+        }
+
+        // 수정 모달 열기
+        function openEditModal() {
+            const item = promptData.find(p => p.id === editingId);
+            if (!item) return;
+            
+            closeModal('viewModal');
+            
+            setTimeout(() => {
+                document.getElementById('editCategory').value = item.category;
+                document.getElementById('editTitle').value = item.title;
+                document.getElementById('editPrompt').value = item.prompt;
+                editedImage = item.image;
+                
+                const editUploadArea = document.getElementById('editImageUpload');
+                editUploadArea.innerHTML = `
+                    <input type="file" id="editImageInput" accept="image/*" hidden onchange="handleEditImageUpload(event)">
+                    <img src="${item.image}" alt="preview">
+                `;
+                editUploadArea.classList.add('has-image');
+                
+                document.getElementById('editModal').classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }, 350);
+        }
+
+        // 수정 이미지 업로드
+        function handleEditImageUpload(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    editedImage = e.target.result;
+                    const uploadArea = document.getElementById('editImageUpload');
+                    uploadArea.innerHTML = `
+                        <input type="file" id="editImageInput" accept="image/*" hidden onchange="handleEditImageUpload(event)">
+                        <img src="${editedImage}" alt="preview">
+                    `;
+                    uploadArea.classList.add('has-image');
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // 수정 저장
+        function saveEdit() {
+            const title = document.getElementById('editTitle').value.trim();
+            const category = document.getElementById('editCategory').value;
+            const prompt = document.getElementById('editPrompt').value.trim();
+
+            if (!editedImage || !title || !prompt) {
+                alert('모든 항목을 입력해주세요!');
+                return;
+            }
+
+            const index = promptData.findIndex(p => p.id === editingId);
+            if (index !== -1) {
+                promptData[index] = {
+                    ...promptData[index],
+                    category: category,
+                    title: title,
+                    image: editedImage,
+                    prompt: prompt
+                };
+                saveToStorage();
+                renderGallery();
+            }
+            
+            closeModal('editModal');
+            editingId = null;
         }
 
         // 업로드 모달 열기
         function openUploadModal() {
+            if (!isAdmin) return;
             document.getElementById('uploadModal').classList.add('active');
             document.body.style.overflow = 'hidden';
             resetUploadForm();
@@ -731,8 +1024,7 @@
         document.querySelectorAll('.modal-overlay').forEach(overlay => {
             overlay.addEventListener('click', (e) => {
                 if (e.target.classList.contains('modal-overlay')) {
-                    const modalId = e.target.id;
-                    closeModal(modalId);
+                    closeModal(e.target.id);
                 }
             });
         });
@@ -776,7 +1068,15 @@
             }
         });
 
-        // 드래그 앤 드롭
+        // 수정 이미지 클릭
+        document.getElementById('editImageUpload').addEventListener('click', function() {
+            const input = document.getElementById('editImageInput');
+            if (input) {
+                input.click();
+            }
+        });
+
+        // 드래그 앤 드롭 (업로드)
         const uploadArea = document.getElementById('imageUpload');
         uploadArea.addEventListener('dragover', (e) => {
             e.preventDefault();
@@ -797,6 +1097,35 @@
                     uploadedImage = ev.target.result;
                     uploadArea.innerHTML = `<img src="${uploadedImage}" alt="preview">`;
                     uploadArea.classList.add('has-image');
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // 드래그 앤 드롭 (수정)
+        const editUploadArea = document.getElementById('editImageUpload');
+        editUploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            editUploadArea.style.borderColor = '#ff2d55';
+            editUploadArea.style.transform = 'scale(1.02)';
+        });
+        editUploadArea.addEventListener('dragleave', () => {
+            editUploadArea.style.borderColor = '#333';
+            editUploadArea.style.transform = 'scale(1)';
+        });
+        editUploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            editUploadArea.style.transform = 'scale(1)';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    editedImage = ev.target.result;
+                    editUploadArea.innerHTML = `
+                        <input type="file" id="editImageInput" accept="image/*" hidden onchange="handleEditImageUpload(event)">
+                        <img src="${editedImage}" alt="preview">
+                    `;
+                    editUploadArea.classList.add('has-image');
                 };
                 reader.readAsDataURL(file);
             }
@@ -829,6 +1158,7 @@
 
         // 프롬프트 삭제
         function deletePrompt(id) {
+            if (!isAdmin) return;
             if (confirm('정말 삭제할까요?')) {
                 promptData = promptData.filter(item => item.id !== id);
                 saveToStorage();
