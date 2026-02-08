@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Namryung Prompt Library</title>
-    
-    <!-- Gmarket Sans 폰트 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/gmarket-sans@1.0.0/css/gmarket-sans.css">
-    
+    <title>NAMRYUNG PROMPT</title>
+    <link href="https://cdn.jsdelivr.net/npm/gmarket-sans@1.0.0/css/gmarket-sans.css" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
     <style>
         * {
             margin: 0;
@@ -16,30 +16,21 @@
         }
 
         body {
-            font-family: 'GmarketSans', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Gmarket Sans', sans-serif;
             background: #0a0a0a;
             color: #fff;
             min-height: 100vh;
         }
 
-        /* 헤더 */
         header {
-            padding: 60px 40px 40px;
             text-align: center;
-            border-bottom: 1px solid #222;
-            position: relative;
+            padding: 50px 20px 30px;
             animation: fadeDown 0.8s ease;
         }
 
         @keyframes fadeDown {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(-30px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         header h1 {
@@ -52,460 +43,414 @@
 
         header p {
             color: #888;
-            font-size: 0.9rem;
-            font-weight: 300;
+            font-size: 1rem;
         }
 
-        /* 관리자 로그인 버튼 */
-        .admin-login-btn {
+        .header-line {
+            width: 100%;
+            max-width: 800px;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, #333, transparent);
+            margin: 30px auto 0;
+        }
+
+        /* 검색창 */
+        .search-container {
+            max-width: 500px;
+            margin: 25px auto;
+            padding: 0 20px;
+            position: relative;
+        }
+
+        .search-box {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 20px;
+            font-size: 1.1rem;
+            opacity: 0.5;
+            z-index: 1;
+        }
+
+        .search-container input {
+            width: 100%;
+            padding: 15px 50px 15px 50px;
+            border: 1px solid #333;
+            border-radius: 30px;
+            background: #111;
+            color: #fff;
+            font-size: 1rem;
+            font-family: 'Gmarket Sans', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .search-container input:focus {
+            outline: none;
+            border-color: #666;
+            box-shadow: 0 0 20px rgba(255,255,255,0.1);
+        }
+
+        .search-container input::placeholder {
+            color: #555;
+        }
+
+        .search-clear {
+            position: absolute;
+            right: 20px;
+            background: none;
+            border: none;
+            color: #555;
+            font-size: 1.2rem;
+            cursor: pointer;
+            display: none;
+        }
+
+        .search-clear.visible {
+            display: block;
+        }
+
+        .search-result-count {
+            text-align: center;
+            color: #666;
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+
+        /* 관리자 버튼 */
+        .admin-btn {
             position: fixed;
             top: 20px;
             right: 20px;
             padding: 10px 20px;
-            background: transparent;
-            border: 1px solid #333;
-            color: #666;
-            border-radius: 20px;
+            background: #222;
+            border: 1px solid #444;
+            border-radius: 25px;
+            color: #fff;
+            font-size: 0.85rem;
             cursor: pointer;
-            font-size: 0.8rem;
-            font-family: 'GmarketSans', sans-serif;
+            z-index: 1000;
             transition: all 0.3s ease;
-            z-index: 9998;
+            font-family: 'Gmarket Sans', sans-serif;
         }
 
-        .admin-login-btn:hover {
-            border-color: #ff2d55;
-            color: #ff2d55;
+        .admin-btn:hover {
+            background: #333;
         }
 
-        .admin-login-btn.logged-in {
-            background: #ff2d55;
-            border-color: #ff2d55;
+        .admin-btn.active {
+            background: #e74c3c;
+            border-color: #e74c3c;
+        }
+
+        /* 필터 */
+        nav {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            flex-wrap: wrap;
+        }
+
+        nav button {
+            padding: 10px 25px;
+            border: 1px solid #333;
+            border-radius: 25px;
+            background: transparent;
+            color: #888;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Gmarket Sans', sans-serif;
+            font-size: 0.9rem;
+        }
+
+        nav button:hover {
+            border-color: #555;
             color: #fff;
         }
 
-        /* 업로드 버튼 - 관리자만 보임 */
+        nav button.active {
+            background: #fff;
+            color: #000;
+            border-color: #fff;
+        }
+
+        /* 갤러리 */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .card {
+            position: relative;
+            border-radius: 15px;
+            overflow: hidden;
+            cursor: pointer;
+            aspect-ratio: 1;
+            animation: cardIn 0.5s ease both;
+        }
+
+        @keyframes cardIn {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .card:hover img {
+            transform: scale(1.1);
+        }
+
+        .card-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(transparent, rgba(0,0,0,0.9));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .card:hover .card-overlay {
+            opacity: 1;
+        }
+
+        .card-category {
+            font-size: 0.75rem;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+
+        .card-title {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .card-delete {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(231, 76, 60, 0.9);
+            border: none;
+            color: #fff;
+            font-size: 1rem;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card-delete.visible {
+            display: flex;
+        }
+
+        /* + 버튼 */
         .add-btn {
             position: fixed;
             bottom: 30px;
             right: 30px;
             width: 70px;
             height: 70px;
+            border-radius: 50%;
             background: #ff2d55;
             border: none;
-            border-radius: 50%;
             color: #fff;
             font-size: 2.5rem;
-            font-weight: 300;
             cursor: pointer;
-            box-shadow: 0 4px 20px rgba(255, 45, 85, 0.5);
             z-index: 9999;
             display: none;
             align-items: center;
             justify-content: center;
-            line-height: 1;
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 5px 30px rgba(255, 45, 85, 0.5);
         }
 
         .add-btn.visible {
             display: flex;
         }
 
-        .add-btn:hover {
-            transform: scale(1.15) rotate(90deg);
-            box-shadow: 0 6px 30px rgba(255, 45, 85, 0.7);
-        }
-
-        /* 카테고리 필터 */
-        .filter-nav {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            padding: 30px 20px;
-            flex-wrap: wrap;
-            animation: fadeUp 0.8s ease 0.2s both;
-        }
-
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .filter-btn {
-            padding: 10px 20px;
-            background: transparent;
-            border: 1px solid #333;
-            color: #888;
-            border-radius: 30px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-size: 0.8rem;
-            font-family: 'GmarketSans', sans-serif;
-            font-weight: 500;
-        }
-
-        .filter-btn:hover {
-            border-color: #fff;
-            color: #fff;
-            transform: translateY(-2px);
-        }
-        
-        .filter-btn.active {
-            background: #fff;
-            color: #000;
-            border-color: #fff;
-        }
-
-        /* 카드 그리드 */
-        .gallery {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 24px;
-            padding: 20px 40px 120px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        /* 카드 */
-        .card {
-            background: #141414;
-            border-radius: 16px;
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-            opacity: 0;
-            animation: cardAppear 0.6s ease forwards;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-
-        @keyframes cardAppear {
-            from {
-                opacity: 0;
-                transform: translateY(30px) scale(0.95);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0) scale(1);
-            }
-        }
-
-        .card:nth-child(1) { animation-delay: 0.1s; }
-        .card:nth-child(2) { animation-delay: 0.2s; }
-        .card:nth-child(3) { animation-delay: 0.3s; }
-        .card:nth-child(4) { animation-delay: 0.4s; }
-        .card:nth-child(5) { animation-delay: 0.5s; }
-        .card:nth-child(6) { animation-delay: 0.6s; }
-        .card:nth-child(7) { animation-delay: 0.7s; }
-        .card:nth-child(8) { animation-delay: 0.8s; }
-
-        .card:hover {
-            transform: translateY(-10px) scale(1.02);
-            box-shadow: 0 25px 50px rgba(255,255,255,0.1);
-        }
-
-        .card-image {
-            width: 100%;
-            aspect-ratio: 4/3;
-            object-fit: cover;
-            background: #222;
-            transition: transform 0.5s ease;
-        }
-
-        .card:hover .card-image {
-            transform: scale(1.05);
-        }
-
-        .card-content {
-            padding: 20px;
-        }
-
-        .card-category {
-            font-size: 0.7rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            font-weight: 500;
-        }
-
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 12px;
-            line-height: 1.4;
-        }
-
-        .card-prompt {
-            font-size: 0.8rem;
-            color: #888;
-            line-height: 1.6;
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            font-weight: 300;
-        }
-
-        /* 삭제 버튼 - 관리자만 보임 */
-        .delete-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 36px;
-            height: 36px;
-            background: rgba(0,0,0,0.7);
-            border: none;
-            border-radius: 50%;
-            color: #ff4757;
-            font-size: 1.2rem;
-            cursor: pointer;
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.3s ease;
-            display: none;
-        }
-
-        .delete-btn.visible {
-            display: block;
-        }
-
-        .card:hover .delete-btn.visible {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .delete-btn:hover {
-            background: #ff4757;
-            color: #fff;
-        }
-
-        /* 모달 공통 */
-        .modal-overlay {
-            display: none;
+        /* 모달 */
+        .modal {
             position: fixed;
             top: 0;
             left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0);
-            z-index: 10000;
-            justify-content: center;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.95);
+            display: none;
             align-items: center;
-            padding: 40px;
-            transition: background 0.3s ease;
+            justify-content: center;
+            z-index: 10000;
+            padding: 20px;
         }
 
-        .modal-overlay.active {
+        .modal.active {
             display: flex;
-            animation: overlayFadeIn 0.3s ease forwards;
         }
 
-        @keyframes overlayFadeIn {
-            to {
-                background: rgba(0,0,0,0.9);
-            }
-        }
-
-        .modal-overlay.closing {
-            animation: overlayFadeOut 0.3s ease forwards;
-        }
-
-        @keyframes overlayFadeOut {
-            from {
-                background: rgba(0,0,0,0.9);
-            }
-            to {
-                background: rgba(0,0,0,0);
-            }
-        }
-
-        .modal {
-            background: #1a1a1a;
+        .modal-content {
+            background: #111;
             border-radius: 20px;
-            max-width: 800px;
+            max-width: 500px;
             width: 100%;
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
-            transform: scale(0.9) translateY(20px);
-            opacity: 0;
-            animation: modalSlideIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        @keyframes modalSlideIn {
-            to {
-                transform: scale(1) translateY(0);
-                opacity: 1;
-            }
-        }
-
-        .modal-overlay.closing .modal {
-            animation: modalSlideOut 0.3s ease forwards;
-        }
-
-        @keyframes modalSlideOut {
-            to {
-                transform: scale(0.9) translateY(20px);
-                opacity: 0;
-            }
-        }
-
-        .modal-image {
-            width: 100%;
-            aspect-ratio: 16/10;
-            object-fit: cover;
-            border-radius: 20px 20px 0 0;
-        }
-
-        .modal-content {
-            padding: 30px;
-        }
-
-        .modal-category {
-            font-size: 0.75rem;
-            color: #666;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 12px;
-            font-weight: 500;
-        }
-
-        .modal-title {
-            font-size: 1.5rem;
-            margin-bottom: 20px;
-            font-weight: 700;
-        }
-
-        .modal-prompt {
-            background: #0a0a0a;
-            padding: 20px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            line-height: 1.8;
-            color: #ccc;
-            margin-bottom: 20px;
-            white-space: pre-wrap;
-            font-weight: 300;
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-        }
-
-        .copy-btn {
-            flex: 1;
-            padding: 16px;
-            background: #fff;
-            color: #000;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            font-family: 'GmarketSans', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .copy-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(255,255,255,0.2);
-        }
-
-        .copy-btn:active {
-            transform: scale(0.98);
-        }
-
-        .copy-btn.copied {
-            background: #22c55e;
-            color: #fff;
-        }
-
-        .edit-btn {
-            background: #ff2d55;
-            color: #fff;
-            display: none;
-        }
-
-        .edit-btn:hover {
-            box-shadow: 0 10px 20px rgba(255, 45, 85, 0.4);
         }
 
         .modal-close {
             position: absolute;
             top: 15px;
             right: 15px;
-            width: 45px;
-            height: 45px;
-            background: rgba(0,0,0,0.7);
-            border: none;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
+            background: #222;
+            border: none;
             color: #fff;
             font-size: 1.5rem;
             cursor: pointer;
             z-index: 10;
-            transition: all 0.3s ease;
         }
 
-        .modal-close:hover {
+        /* 보기 모달 */
+        .view-modal .modal-content {
+            max-width: 600px;
+        }
+
+        .view-modal img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .view-info {
+            padding: 25px;
+        }
+
+        .view-category {
+            font-size: 0.85rem;
+            color: #888;
+            margin-bottom: 10px;
+        }
+
+        .view-title {
+            font-size: 1.5rem;
+            margin-bottom: 20px;
+        }
+
+        .view-prompt {
+            background: #1a1a1a;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #ccc;
+            margin-bottom: 20px;
+        }
+
+        .view-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .view-actions button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            cursor: pointer;
+            font-family: 'Gmarket Sans', sans-serif;
+        }
+
+        .copy-btn {
             background: #fff;
             color: #000;
-            transform: rotate(90deg);
         }
 
-        /* 업로드/수정 모달 */
-        .upload-modal {
-            max-width: 500px;
+        .edit-btn {
+            background: #3498db;
+            color: #fff;
         }
 
-        .upload-modal .modal-content {
-            padding: 40px;
+        /* 업로드 모달 */
+        .upload-modal .modal-content,
+        .edit-modal .modal-content {
+            padding: 30px;
         }
 
-        .upload-modal h2 {
-            margin-bottom: 30px;
+        .modal h2 {
             text-align: center;
-            font-weight: 700;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+        }
+
+        .upload-area {
+            border: 2px dashed #333;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area.has-image {
+            padding: 0;
+            border-style: solid;
+        }
+
+        .upload-area img {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 13px;
+        }
+
+        .upload-area p {
+            color: #666;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         .form-group label {
             display: block;
             margin-bottom: 8px;
-            font-size: 0.85rem;
             color: #888;
-            font-weight: 500;
+            font-size: 0.9rem;
         }
 
         .form-group input,
         .form-group select,
         .form-group textarea {
             width: 100%;
-            padding: 14px;
-            background: #0a0a0a;
+            padding: 15px;
             border: 1px solid #333;
             border-radius: 10px;
+            background: #1a1a1a;
             color: #fff;
-            font-size: 0.95rem;
-            font-family: 'GmarketSans', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus,
-        .form-group textarea:focus {
-            outline: none;
-            border-color: #ff2d55;
-            box-shadow: 0 0 0 3px rgba(255, 45, 85, 0.1);
+            font-size: 1rem;
+            font-family: 'Gmarket Sans', sans-serif;
         }
 
         .form-group textarea {
@@ -513,302 +458,237 @@
             resize: vertical;
         }
 
-        /* 이미지 업로드 영역 */
-        .image-upload {
-            border: 2px dashed #333;
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .image-upload:hover {
-            border-color: #ff2d55;
-            background: rgba(255, 45, 85, 0.05);
-            transform: scale(1.02);
-        }
-
-        .image-upload.has-image {
-            padding: 0;
-            border: none;
-        }
-
-        .image-upload img {
-            width: 100%;
-            border-radius: 12px;
-        }
-
-        .image-upload-text {
-            color: #666;
-            font-weight: 300;
-        }
-
-        .image-upload-text span {
-            color: #ff2d55;
-            font-weight: 500;
-        }
-
         .submit-btn {
             width: 100%;
-            padding: 16px;
-            background: #ff2d55;
-            color: #fff;
+            padding: 18px;
+            background: #fff;
             border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 700;
+            border-radius: 10px;
+            color: #000;
+            font-size: 1.1rem;
+            font-weight: 600;
             cursor: pointer;
-            margin-top: 10px;
-            font-family: 'GmarketSans', sans-serif;
-            transition: all 0.3s ease;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(255, 45, 85, 0.4);
-        }
-
-        .submit-btn:active {
-            transform: scale(0.98);
+            font-family: 'Gmarket Sans', sans-serif;
         }
 
         /* 로그인 모달 */
-        .login-modal {
-            max-width: 400px;
-        }
-
         .login-modal .modal-content {
-            padding: 40px;
-            text-align: center;
-        }
-
-        .login-modal h2 {
-            margin-bottom: 30px;
-            font-weight: 700;
+            max-width: 350px;
+            padding: 30px;
         }
 
         .login-modal input {
             width: 100%;
-            padding: 14px;
-            background: #0a0a0a;
+            padding: 15px;
             border: 1px solid #333;
             border-radius: 10px;
+            background: #1a1a1a;
             color: #fff;
             font-size: 1rem;
-            font-family: 'GmarketSans', sans-serif;
-            margin-bottom: 20px;
-            text-align: center;
-        }
-
-        .login-modal input:focus {
-            outline: none;
-            border-color: #ff2d55;
-        }
-
-        .login-error {
-            color: #ff4757;
-            font-size: 0.85rem;
             margin-bottom: 15px;
-            display: none;
+            font-family: 'Gmarket Sans', sans-serif;
         }
 
-        /* 빈 상태 */
         .empty-state {
             text-align: center;
-            padding: 100px 20px;
-            color: #444;
-            animation: fadeUp 0.8s ease;
+            padding: 80px 20px;
+            color: #555;
         }
 
-        .empty-state p {
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-            font-weight: 500;
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
         }
 
         /* 반응형 */
         @media (max-width: 768px) {
-            header { padding: 40px 20px 30px; }
-            header h1 { font-size: 1.8rem; }
-            .gallery { padding: 20px 20px 120px; gap: 16px; }
-            .filter-nav { padding: 20px 15px; gap: 8px; }
-            .filter-btn { padding: 8px 14px; font-size: 0.75rem; }
-            .add-btn { 
-                bottom: 20px; 
-                right: 20px; 
+            header h1 {
+                font-size: 1.8rem;
+            }
+
+            .gallery {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+                padding: 15px;
+            }
+
+            nav {
+                gap: 8px;
+                padding: 15px;
+            }
+
+            nav button {
+                padding: 8px 16px;
+                font-size: 0.8rem;
+            }
+
+            .add-btn {
                 width: 60px;
                 height: 60px;
                 font-size: 2rem;
+                bottom: 20px;
+                right: 20px;
             }
-            .modal-overlay { padding: 20px; }
-            .admin-login-btn {
-                top: 15px;
-                right: 15px;
-                padding: 8px 15px;
-                font-size: 0.75rem;
-            }
-            .btn-group {
-                flex-direction: column;
+        }
+
+        @media (max-width: 480px) {
+            .gallery {
+                grid-template-columns: 1fr;
             }
         }
     </style>
 </head>
 <body>
-
-    <!-- 관리자 로그인 버튼 -->
-    <button class="admin-login-btn" id="adminLoginBtn" onclick="toggleAdminLogin()">Admin</button>
-
-    <!-- 업로드 버튼 (관리자만) -->
-    <button class="add-btn" id="addBtn" onclick="openUploadModal()">+</button>
+    <button class="admin-btn" id="adminBtn">Admin</button>
 
     <header>
         <h1>NAMRYUNG<br>PROMPT</h1>
         <p>AI Image Prompt Library</p>
+        <div class="header-line"></div>
     </header>
 
-    <nav class="filter-nav">
-        <button class="filter-btn active" data-filter="all">All</button>
-        <button class="filter-btn" data-filter="fashion">Fashion</button>
-        <button class="filter-btn" data-filter="product">Product</button>
-        <button class="filter-btn" data-filter="concept">Concept Art</button>
-        <button class="filter-btn" data-filter="photo">Photography</button>
-        <button class="filter-btn" data-filter="typography">Typography</button>
-        <button class="filter-btn" data-filter="illustration">Illustration</button>
-        <button class="filter-btn" data-filter="texture">Texture</button>
+    <!-- 검색창 -->
+    <div class="search-container">
+        <div class="search-box">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="프롬프트 검색...">
+            <button class="search-clear" id="searchClear">&times;</button>
+        </div>
+        <div class="search-result-count" id="searchResultCount"></div>
+    </div>
+
+    <nav>
+        <button class="active" data-filter="all">All</button>
+        <button data-filter="fashion">Fashion</button>
+        <button data-filter="product">Product</button>
+        <button data-filter="concept">Concept Art</button>
+        <button data-filter="photo">Photography</button>
+        <button data-filter="typography">Typography</button>
+        <button data-filter="illustration">Illustration</button>
+        <button data-filter="texture">Texture</button>
     </nav>
 
-    <main class="gallery" id="gallery"></main>
+    <div class="gallery" id="gallery">
+        <div class="loading">Loading...</div>
+    </div>
+
+    <button class="add-btn" id="addBtn">+</button>
 
     <!-- 보기 모달 -->
-    <div class="modal-overlay" id="viewModal">
-        <div class="modal">
-            <button class="modal-close" onclick="closeModal('viewModal')">×</button>
-            <img class="modal-image" id="modalImage" src="" alt="">
-            <div class="modal-content">
-                <div class="modal-category" id="modalCategory"></div>
-                <h2 class="modal-title" id="modalTitle"></h2>
-                <div class="modal-prompt" id="modalPrompt"></div>
-                <div class="btn-group">
-                    <button class="copy-btn" onclick="copyPrompt()">Copy Prompt</button>
-                    <button class="copy-btn edit-btn" id="editBtn" onclick="openEditModal()">Edit</button>
+    <div class="modal view-modal" id="viewModal">
+        <div class="modal-content">
+            <button class="modal-close" id="viewClose">&times;</button>
+            <img src="" alt="" id="viewImage">
+            <div class="view-info">
+                <div class="view-category" id="viewCategory"></div>
+                <h2 class="view-title" id="viewTitle"></h2>
+                <div class="view-prompt" id="viewPrompt"></div>
+                <div class="view-actions">
+                    <button class="copy-btn" id="copyBtn">📋 Copy</button>
+                    <button class="edit-btn" id="editBtn" style="display:none;">✏️ Edit</button>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- 업로드 모달 -->
-    <div class="modal-overlay" id="uploadModal">
-        <div class="modal upload-modal">
-            <button class="modal-close" onclick="closeModal('uploadModal')">×</button>
-            <div class="modal-content">
-                <h2>새 프롬프트 추가</h2>
-                
-                <div class="form-group">
-                    <label>이미지</label>
-                    <div class="image-upload" id="imageUpload">
-                        <input type="file" id="imageInput" accept="image/*" hidden onchange="handleImageUpload(event)">
-                        <p class="image-upload-text">클릭해서 이미지 업로드<br><span>또는 드래그 앤 드롭</span></p>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>카테고리</label>
-                    <select id="inputCategory">
-                        <option value="fashion">Fashion</option>
-                        <option value="product">Product</option>
-                        <option value="concept">Concept Art</option>
-                        <option value="photo">Photography</option>
-                        <option value="typography">Typography</option>
-                        <option value="illustration">Illustration</option>
-                        <option value="texture">Texture</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>제목</label>
-                    <input type="text" id="inputTitle" placeholder="프롬프트 제목 입력">
-                </div>
-
-                <div class="form-group">
-                    <label>프롬프트</label>
-                    <textarea id="inputPrompt" placeholder="프롬프트 내용 입력"></textarea>
-                </div>
-
-                <button class="submit-btn" onclick="savePrompt()">저장하기</button>
+    <div class="modal upload-modal" id="uploadModal">
+        <div class="modal-content">
+            <button class="modal-close" id="uploadClose">&times;</button>
+            <h2>새 프롬프트 추가</h2>
+            <div class="upload-area" id="uploadArea">
+                <p>📷 클릭하거나 이미지를 드래그하세요</p>
             </div>
+            <input type="file" id="fileInput" accept="image/*" style="display:none;">
+            <div class="form-group">
+                <label>카테고리</label>
+                <select id="uploadCategory">
+                    <option value="fashion">Fashion</option>
+                    <option value="product">Product</option>
+                    <option value="concept">Concept Art</option>
+                    <option value="photo">Photography</option>
+                    <option value="typography">Typography</option>
+                    <option value="illustration">Illustration</option>
+                    <option value="texture">Texture</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>제목</label>
+                <input type="text" id="uploadTitle" placeholder="프롬프트 제목">
+            </div>
+            <div class="form-group">
+                <label>프롬프트</label>
+                <textarea id="uploadPrompt" placeholder="프롬프트 내용을 입력하세요..."></textarea>
+            </div>
+            <button class="submit-btn" id="submitBtn">저장하기</button>
         </div>
     </div>
 
     <!-- 수정 모달 -->
-    <div class="modal-overlay" id="editModal">
-        <div class="modal upload-modal">
-            <button class="modal-close" onclick="closeModal('editModal')">×</button>
-            <div class="modal-content">
-                <h2>프롬프트 수정</h2>
-                
-                <div class="form-group">
-                    <label>이미지</label>
-                    <div class="image-upload" id="editImageUpload">
-                        <input type="file" id="editImageInput" accept="image/*" hidden onchange="handleEditImageUpload(event)">
-                        <p class="image-upload-text">클릭해서 이미지 변경<br><span>또는 드래그 앤 드롭</span></p>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>카테고리</label>
-                    <select id="editCategory">
-                        <option value="fashion">Fashion</option>
-                        <option value="product">Product</option>
-                        <option value="concept">Concept Art</option>
-                        <option value="photo">Photography</option>
-                        <option value="typography">Typography</option>
-                        <option value="illustration">Illustration</option>
-                        <option value="texture">Texture</option>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label>제목</label>
-                    <input type="text" id="editTitle" placeholder="프롬프트 제목 입력">
-                </div>
-
-                <div class="form-group">
-                    <label>프롬프트</label>
-                    <textarea id="editPrompt" placeholder="프롬프트 내용 입력"></textarea>
-                </div>
-
-                <button class="submit-btn" onclick="saveEdit()">수정 완료</button>
+    <div class="modal edit-modal" id="editModal">
+        <div class="modal-content">
+            <button class="modal-close" id="editClose">&times;</button>
+            <h2>프롬프트 수정</h2>
+            <div class="upload-area" id="editArea">
+                <p>📷 클릭하거나 이미지를 드래그하세요</p>
             </div>
+            <input type="file" id="editFileInput" accept="image/*" style="display:none;">
+            <div class="form-group">
+                <label>카테고리</label>
+                <select id="editCategory">
+                    <option value="fashion">Fashion</option>
+                    <option value="product">Product</option>
+                    <option value="concept">Concept Art</option>
+                    <option value="photo">Photography</option>
+                    <option value="typography">Typography</option>
+                    <option value="illustration">Illustration</option>
+                    <option value="texture">Texture</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>제목</label>
+                <input type="text" id="editTitle" placeholder="프롬프트 제목">
+            </div>
+            <div class="form-group">
+                <label>프롬프트</label>
+                <textarea id="editPromptText" placeholder="프롬프트 내용을 입력하세요..."></textarea>
+            </div>
+            <button class="submit-btn" id="updateBtn">수정하기</button>
         </div>
     </div>
 
     <!-- 로그인 모달 -->
-    <div class="modal-overlay" id="loginModal">
-        <div class="modal login-modal">
-            <button class="modal-close" onclick="closeModal('loginModal')">×</button>
-            <div class="modal-content">
-                <h2>🔐 Admin Login</h2>
-                <p class="login-error" id="loginError">비밀번호가 틀렸습니다</p>
-                <input type="password" id="adminPassword" placeholder="비밀번호 입력" onkeypress="handleLoginKeypress(event)">
-                <button class="submit-btn" onclick="adminLogin()">로그인</button>
-            </div>
+    <div class="modal login-modal" id="loginModal">
+        <div class="modal-content">
+            <button class="modal-close" id="loginClose">&times;</button>
+            <h2>🔐 Admin Login</h2>
+            <input type="password" id="passwordInput" placeholder="비밀번호 입력">
+            <button class="submit-btn" id="loginBtn">로그인</button>
         </div>
     </div>
 
     <script>
-        // ⭐ 관리자 비밀번호 설정 (원하는 걸로 바꿔!)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCb7lFBY8SgDqTEw5b4DCbeCBhna8UW5vw",
+            authDomain: "namryung-prompt-feac3.firebaseapp.com",
+            projectId: "namryung-prompt-feac3",
+            storageBucket: "namryung-prompt-feac3.firebasestorage.app",
+            messagingSenderId: "216508208287",
+            appId: "1:216508208287:web:309e725ad8faf873e43eaa",
+            measurementId: "G-3MDFVV9SZZ"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
         const ADMIN_PASSWORD = 'namryung123';
-
-        // 상태 변수
         let isAdmin = false;
-        let promptData = JSON.parse(localStorage.getItem('promptData')) || [];
-        let uploadedImage = '';
-        let currentPrompt = '';
-        let editingId = null;
-        let editedImage = '';
+        let currentFilter = 'all';
+        let currentEditId = null;
+        let uploadedFile = null;
 
-        // 카테고리 한글 매핑
         const categoryNames = {
             fashion: 'Fashion',
             product: 'Product',
@@ -819,383 +699,321 @@
             texture: 'Texture'
         };
 
-        // 데이터 저장
-        function saveToStorage() {
-            localStorage.setItem('promptData', JSON.stringify(promptData));
-        }
-
-        // 관리자 로그인 토글
-        function toggleAdminLogin() {
-            if (isAdmin) {
-                isAdmin = false;
-                updateAdminUI();
-            } else {
-                document.getElementById('loginModal').classList.add('active');
-                document.getElementById('adminPassword').value = '';
-                document.getElementById('loginError').style.display = 'none';
-                document.body.style.overflow = 'hidden';
-            }
-        }
-
-        // 로그인 처리
-        function adminLogin() {
-            const password = document.getElementById('adminPassword').value;
-            if (password === ADMIN_PASSWORD) {
-                isAdmin = true;
-                closeModal('loginModal');
-                updateAdminUI();
-                renderGallery();
-            } else {
-                document.getElementById('loginError').style.display = 'block';
-                document.getElementById('adminPassword').value = '';
-            }
-        }
-
-        // 엔터키 로그인
-        function handleLoginKeypress(event) {
-            if (event.key === 'Enter') {
-                adminLogin();
-            }
-        }
-
-        // 관리자 UI 업데이트
-        function updateAdminUI() {
-            const loginBtn = document.getElementById('adminLoginBtn');
-            const addBtn = document.getElementById('addBtn');
-
-            if (isAdmin) {
-                loginBtn.textContent = 'Logout';
-                loginBtn.classList.add('logged-in');
-                addBtn.classList.add('visible');
-            } else {
-                loginBtn.textContent = 'Admin';
-                loginBtn.classList.remove('logged-in');
-                addBtn.classList.remove('visible');
-            }
-            renderGallery();
-        }
+        const gallery = document.getElementById('gallery');
+        const searchInput = document.getElementById('searchInput');
+        const searchClear = document.getElementById('searchClear');
+        const searchResultCount = document.getElementById('searchResultCount');
 
         // 갤러리 렌더링
-        function renderGallery(filter = 'all') {
-            const gallery = document.getElementById('gallery');
-            const filtered = filter === 'all' 
-                ? promptData 
-                : promptData.filter(item => item.category === filter);
+        async function renderGallery(searchQuery = '') {
+            gallery.innerHTML = '<div class="loading">Loading...</div>';
             
-            if (filtered.length === 0) {
-                gallery.innerHTML = `
-                    <div class="empty-state" style="grid-column: 1/-1;">
-                        <p>아직 등록된 프롬프트가 없어요</p>
-                        <p style="font-size: 0.9rem; font-weight: 300;">${isAdmin ? '+ 버튼으로 추가해보세요!' : '곧 업데이트 예정!'}</p>
+            try {
+                const snapshot = await db.collection('prompts').orderBy('createdAt', 'desc').get();
+                let prompts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                
+                if (currentFilter !== 'all') {
+                    prompts = prompts.filter(p => p.category === currentFilter);
+                }
+                
+                if (searchQuery) {
+                    const query = searchQuery.toLowerCase();
+                    prompts = prompts.filter(p => 
+                        p.title?.toLowerCase().includes(query) ||
+                        p.prompt?.toLowerCase().includes(query) ||
+                        categoryNames[p.category]?.toLowerCase().includes(query)
+                    );
+                }
+                
+                searchResultCount.textContent = searchQuery ? `${prompts.length}개 결과` : '';
+                
+                if (prompts.length === 0) {
+                    gallery.innerHTML = '<div class="empty-state"><p>프롬프트가 없습니다</p></div>';
+                    return;
+                }
+                
+                gallery.innerHTML = prompts.map((item, index) => `
+                    <div class="card" data-id="${item.id}" style="animation-delay: ${index * 0.05}s">
+                        <img src="${item.image}" alt="${item.title}">
+                        <div class="card-overlay">
+                            <div class="card-category">${categoryNames[item.category] || item.category}</div>
+                            <div class="card-title">${item.title}</div>
+                        </div>
+                        <button class="card-delete ${isAdmin ? 'visible' : ''}" data-id="${item.id}">&times;</button>
                     </div>
-                `;
-                return;
+                `).join('');
+                
+                document.querySelectorAll('.card').forEach(card => {
+                    card.addEventListener('click', (e) => {
+                        if (!e.target.classList.contains('card-delete')) {
+                            openViewModal(card.dataset.id);
+                        }
+                    });
+                });
+                
+                document.querySelectorAll('.card-delete').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        deletePrompt(btn.dataset.id);
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Error:', error);
+                gallery.innerHTML = '<div class="empty-state"><p>로딩 실패</p></div>';
             }
-
-            gallery.innerHTML = filtered.map((item, index) => `
-                <div class="card" style="animation-delay: ${index * 0.1}s" onclick="openViewModal(${item.id})">
-                    <button class="delete-btn ${isAdmin ? 'visible' : ''}" onclick="event.stopPropagation(); deletePrompt(${item.id})">×</button>
-                    <img class="card-image" src="${item.image}" alt="${item.title}">
-                    <div class="card-content">
-                        <div class="card-category">${categoryNames[item.category] || item.category}</div>
-                        <h3 class="card-title">${item.title}</h3>
-                        <p class="card-prompt">${item.prompt}</p>
-                    </div>
-                </div>
-            `).join('');
         }
 
-        // 필터 버튼
-        document.querySelectorAll('.filter-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                renderGallery(btn.dataset.filter);
-            });
-        });
+        // 보기 모달
+        async function openViewModal(id) {
+            try {
+                const doc = await db.collection('prompts').doc(id).get();
+                if (!doc.exists) return;
+                
+                const data = doc.data();
+                document.getElementById('viewImage').src = data.image;
+                document.getElementById('viewCategory').textContent = categoryNames[data.category] || data.category;
+                document.getElementById('viewTitle').textContent = data.title;
+                document.getElementById('viewPrompt').textContent = data.prompt;
+                document.getElementById('editBtn').style.display = isAdmin ? 'block' : 'none';
+                
+                currentEditId = id;
+                document.getElementById('viewModal').classList.add('active');
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
 
-        // 보기 모달 열기
-        function openViewModal(id) {
-            const item = promptData.find(p => p.id === id);
-            document.getElementById('modalImage').src = item.image;
-            document.getElementById('modalCategory').textContent = categoryNames[item.category] || item.category;
-            document.getElementById('modalTitle').textContent = item.title;
-            document.getElementById('modalPrompt').textContent = item.prompt;
-            document.getElementById('viewModal').classList.add('active');
-            currentPrompt = item.prompt;
-            editingId = id;
+        // 삭제
+        async function deletePrompt(id) {
+            if (!confirm('정말 삭제하시겠습니까?')) return;
             
-            // 관리자면 Edit 버튼 보이기
-            document.getElementById('editBtn').style.display = isAdmin ? 'block' : 'none';
+            try {
+                await db.collection('prompts').doc(id).delete();
+                renderGallery(searchInput.value);
+            } catch (error) {
+                console.error('Error:', error);
+                alert('삭제 실패!');
+            }
+        }
+
+        // 이미지 업로드
+        async function uploadImage(file) {
+            const fileName = Date.now() + '_' + file.name;
+            const ref = storage.ref().child('images/' + fileName);
+            await ref.put(file);
+            return await ref.getDownloadURL();
+        }
+
+        // 저장
+        async function savePrompt() {
+            const category = document.getElementById('uploadCategory').value;
+            const title = document.getElementById('uploadTitle').value.trim();
+            const prompt = document.getElementById('uploadPrompt').value.trim();
             
-            document.body.style.overflow = 'hidden';
+            if (!uploadedFile || !title || !prompt) {
+                alert('모든 필드를 입력해주세요!');
+                return;
+            }
+            
+            try {
+                document.getElementById('submitBtn').textContent = '업로드 중...';
+                const imageUrl = await uploadImage(uploadedFile);
+                
+                await db.collection('prompts').add({
+                    category,
+                    title,
+                    prompt,
+                    image: imageUrl,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                uploadedFile = null;
+                document.getElementById('uploadArea').innerHTML = '<p>📷 클릭하거나 이미지를 드래그하세요</p>';
+                document.getElementById('uploadArea').classList.remove('has-image');
+                document.getElementById('uploadTitle').value = '';
+                document.getElementById('uploadPrompt').value = '';
+                document.getElementById('submitBtn').textContent = '저장하기';
+                
+                document.getElementById('uploadModal').classList.remove('active');
+                renderGallery();
+                alert('저장 완료!');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('저장 실패!');
+                document.getElementById('submitBtn').textContent = '저장하기';
+            }
+        }
+
+        // 수정
+        async function updatePrompt() {
+            if (!currentEditId) return;
+            
+            const category = document.getElementById('editCategory').value;
+            const title = document.getElementById('editTitle').value.trim();
+            const prompt = document.getElementById('editPromptText').value.trim();
+            
+            if (!title || !prompt) {
+                alert('모든 필드를 입력해주세요!');
+                return;
+            }
+            
+            try {
+                document.getElementById('updateBtn').textContent = '수정 중...';
+                const updateData = { category, title, prompt };
+                
+                if (uploadedFile) {
+                    updateData.image = await uploadImage(uploadedFile);
+                }
+                
+                await db.collection('prompts').doc(currentEditId).update(updateData);
+                
+                uploadedFile = null;
+                document.getElementById('editModal').classList.remove('active');
+                document.getElementById('viewModal').classList.remove('active');
+                document.getElementById('updateBtn').textContent = '수정하기';
+                renderGallery(searchInput.value);
+                alert('수정 완료!');
+            } catch (error) {
+                console.error('Error:', error);
+                alert('수정 실패!');
+                document.getElementById('updateBtn').textContent = '수정하기';
+            }
         }
 
         // 수정 모달 열기
-        function openEditModal() {
-            const item = promptData.find(p => p.id === editingId);
-            if (!item) return;
+        async function openEditModal() {
+            if (!currentEditId) return;
             
-            closeModal('viewModal');
-            
-            setTimeout(() => {
-                document.getElementById('editCategory').value = item.category;
-                document.getElementById('editTitle').value = item.title;
-                document.getElementById('editPrompt').value = item.prompt;
-                editedImage = item.image;
+            try {
+                const doc = await db.collection('prompts').doc(currentEditId).get();
+                if (!doc.exists) return;
                 
-                const editUploadArea = document.getElementById('editImageUpload');
-                editUploadArea.innerHTML = `
-                    <input type="file" id="editImageInput" accept="image/*" hidden onchange="handleEditImageUpload(event)">
-                    <img src="${item.image}" alt="preview">
-                `;
-                editUploadArea.classList.add('has-image');
+                const data = doc.data();
+                document.getElementById('editCategory').value = data.category;
+                document.getElementById('editTitle').value = data.title;
+                document.getElementById('editPromptText').value = data.prompt;
                 
+                const editArea = document.getElementById('editArea');
+                editArea.innerHTML = `<img src="${data.image}" alt="preview">`;
+                editArea.classList.add('has-image');
+                
+                document.getElementById('viewModal').classList.remove('active');
                 document.getElementById('editModal').classList.add('active');
-                document.body.style.overflow = 'hidden';
-            }, 350);
-        }
-
-        // 수정 이미지 업로드
-        function handleEditImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    editedImage = e.target.result;
-                    const uploadArea = document.getElementById('editImageUpload');
-                    uploadArea.innerHTML = `
-                        <input type="file" id="editImageInput" accept="image/*" hidden onchange="handleEditImageUpload(event)">
-                        <img src="${editedImage}" alt="preview">
-                    `;
-                    uploadArea.classList.add('has-image');
-                };
-                reader.readAsDataURL(file);
+            } catch (error) {
+                console.error('Error:', error);
             }
         }
 
-        // 수정 저장
-        function saveEdit() {
-            const title = document.getElementById('editTitle').value.trim();
-            const category = document.getElementById('editCategory').value;
-            const prompt = document.getElementById('editPrompt').value.trim();
-
-            if (!editedImage || !title || !prompt) {
-                alert('모든 항목을 입력해주세요!');
-                return;
-            }
-
-            const index = promptData.findIndex(p => p.id === editingId);
-            if (index !== -1) {
-                promptData[index] = {
-                    ...promptData[index],
-                    category: category,
-                    title: title,
-                    image: editedImage,
-                    prompt: prompt
-                };
-                saveToStorage();
-                renderGallery();
-            }
+        // 이미지 미리보기
+        function handleImagePreview(file, targetArea) {
+            if (!file || !file.type.startsWith('image/')) return;
             
-            closeModal('editModal');
-            editingId = null;
+            uploadedFile = file;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                targetArea.innerHTML = `<img src="${e.target.result}" alt="preview">`;
+                targetArea.classList.add('has-image');
+            };
+            reader.readAsDataURL(file);
         }
 
-        // 업로드 모달 열기
-        function openUploadModal() {
-            if (!isAdmin) return;
-            document.getElementById('uploadModal').classList.add('active');
-            document.body.style.overflow = 'hidden';
-            resetUploadForm();
+        // 검색
+        function handleSearch() {
+            const query = searchInput.value.trim();
+            searchClear.classList.toggle('visible', query.length > 0);
+            renderGallery(query);
         }
 
-        // 모달 닫기 (애니메이션 포함)
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.classList.add('closing');
-            setTimeout(() => {
-                modal.classList.remove('active', 'closing');
-                document.body.style.overflow = 'auto';
-            }, 300);
+        // 관리자
+        function toggleAdmin() {
+            if (isAdmin) {
+                isAdmin = false;
+                document.getElementById('adminBtn').classList.remove('active');
+                document.getElementById('adminBtn').textContent = 'Admin';
+                document.getElementById('addBtn').classList.remove('visible');
+                renderGallery(searchInput.value);
+            } else {
+                document.getElementById('loginModal').classList.add('active');
+            }
         }
 
-        // 모달 바깥 클릭시 닫기
-        document.querySelectorAll('.modal-overlay').forEach(overlay => {
-            overlay.addEventListener('click', (e) => {
-                if (e.target.classList.contains('modal-overlay')) {
-                    closeModal(e.target.id);
-                }
+        function handleLogin() {
+            const password = document.getElementById('passwordInput').value;
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                document.getElementById('adminBtn').classList.add('active');
+                document.getElementById('adminBtn').textContent = 'Logout';
+                document.getElementById('addBtn').classList.add('visible');
+                document.getElementById('loginModal').classList.remove('active');
+                document.getElementById('passwordInput').value = '';
+                renderGallery(searchInput.value);
+            } else {
+                alert('비밀번호가 틀렸습니다!');
+            }
+        }
+
+        // 이벤트
+        document.getElementById('adminBtn').addEventListener('click', toggleAdmin);
+        document.getElementById('addBtn').addEventListener('click', () => document.getElementById('uploadModal').classList.add('active'));
+        
+        searchInput.addEventListener('input', handleSearch);
+        searchClear.addEventListener('click', () => {
+            searchInput.value = '';
+            handleSearch();
+        });
+        
+        document.querySelectorAll('nav button').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelector('nav button.active').classList.remove('active');
+                btn.classList.add('active');
+                currentFilter = btn.dataset.filter;
+                renderGallery(searchInput.value);
             });
         });
-
-        // ESC 키로 닫기
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') {
-                document.querySelectorAll('.modal-overlay.active').forEach(m => {
-                    closeModal(m.id);
-                });
-            }
+        
+        document.getElementById('viewClose').addEventListener('click', () => document.getElementById('viewModal').classList.remove('active'));
+        document.getElementById('uploadClose').addEventListener('click', () => document.getElementById('uploadModal').classList.remove('active'));
+        document.getElementById('editClose').addEventListener('click', () => document.getElementById('editModal').classList.remove('active'));
+        document.getElementById('loginClose').addEventListener('click', () => document.getElementById('loginModal').classList.remove('active'));
+        
+        document.getElementById('copyBtn').addEventListener('click', () => {
+            navigator.clipboard.writeText(document.getElementById('viewPrompt').textContent);
+            alert('복사 완료!');
         });
-
-        // 이미지 업로드 처리
-        function handleImageUpload(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    uploadedImage = e.target.result;
-                    const uploadArea = document.getElementById('imageUpload');
-                    uploadArea.innerHTML = `<img src="${uploadedImage}" alt="preview">`;
-                    uploadArea.classList.add('has-image');
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-
-        // 이미지 업로드 클릭
-        document.getElementById('imageUpload').addEventListener('click', function() {
-            const input = document.getElementById('imageInput');
-            if (input) {
-                input.click();
-            } else {
-                this.innerHTML = `
-                    <input type="file" id="imageInput" accept="image/*" hidden onchange="handleImageUpload(event)">
-                    <p class="image-upload-text">클릭해서 이미지 업로드<br><span>또는 드래그 앤 드롭</span></p>
-                `;
-                this.classList.remove('has-image');
-                uploadedImage = '';
-            }
-        });
-
-        // 수정 이미지 클릭
-        document.getElementById('editImageUpload').addEventListener('click', function() {
-            const input = document.getElementById('editImageInput');
-            if (input) {
-                input.click();
-            }
-        });
-
-        // 드래그 앤 드롭 (업로드)
-        const uploadArea = document.getElementById('imageUpload');
-        uploadArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadArea.style.borderColor = '#ff2d55';
-            uploadArea.style.transform = 'scale(1.02)';
-        });
-        uploadArea.addEventListener('dragleave', () => {
-            uploadArea.style.borderColor = '#333';
-            uploadArea.style.transform = 'scale(1)';
-        });
+        
+        document.getElementById('editBtn').addEventListener('click', openEditModal);
+        
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => e.preventDefault());
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            uploadArea.style.transform = 'scale(1)';
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    uploadedImage = ev.target.result;
-                    uploadArea.innerHTML = `<img src="${uploadedImage}" alt="preview">`;
-                    uploadArea.classList.add('has-image');
-                };
-                reader.readAsDataURL(file);
-            }
+            handleImagePreview(e.dataTransfer.files[0], uploadArea);
         });
-
-        // 드래그 앤 드롭 (수정)
-        const editUploadArea = document.getElementById('editImageUpload');
-        editUploadArea.addEventListener('dragover', (e) => {
+        fileInput.addEventListener('change', (e) => handleImagePreview(e.target.files[0], uploadArea));
+        
+        const editArea = document.getElementById('editArea');
+        const editFileInput = document.getElementById('editFileInput');
+        
+        editArea.addEventListener('click', () => editFileInput.click());
+        editArea.addEventListener('dragover', (e) => e.preventDefault());
+        editArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            editUploadArea.style.borderColor = '#ff2d55';
-            editUploadArea.style.transform = 'scale(1.02)';
+            handleImagePreview(e.dataTransfer.files[0], editArea);
         });
-        editUploadArea.addEventListener('dragleave', () => {
-            editUploadArea.style.borderColor = '#333';
-            editUploadArea.style.transform = 'scale(1)';
+        editFileInput.addEventListener('change', (e) => handleImagePreview(e.target.files[0], editArea));
+        
+        document.getElementById('submitBtn').addEventListener('click', savePrompt);
+        document.getElementById('updateBtn').addEventListener('click', updatePrompt);
+        document.getElementById('loginBtn').addEventListener('click', handleLogin);
+        document.getElementById('passwordInput').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
         });
-        editUploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            editUploadArea.style.transform = 'scale(1)';
-            const file = e.dataTransfer.files[0];
-            if (file && file.type.startsWith('image/')) {
-                const reader = new FileReader();
-                reader.onload = function(ev) {
-                    editedImage = ev.target.result;
-                    editUploadArea.innerHTML = `
-                        <input type="file" id="editImageInput" accept="image/*" hidden onchange="handleEditImageUpload(event)">
-                        <img src="${editedImage}" alt="preview">
-                    `;
-                    editUploadArea.classList.add('has-image');
-                };
-                reader.readAsDataURL(file);
-            }
-        });
-
-        // 프롬프트 저장
-        function savePrompt() {
-            const title = document.getElementById('inputTitle').value.trim();
-            const category = document.getElementById('inputCategory').value;
-            const prompt = document.getElementById('inputPrompt').value.trim();
-
-            if (!uploadedImage || !title || !prompt) {
-                alert('모든 항목을 입력해주세요!');
-                return;
-            }
-
-            const newItem = {
-                id: Date.now(),
-                category: category,
-                title: title,
-                image: uploadedImage,
-                prompt: prompt
-            };
-
-            promptData.unshift(newItem);
-            saveToStorage();
-            renderGallery();
-            closeModal('uploadModal');
-        }
-
-        // 프롬프트 삭제
-        function deletePrompt(id) {
-            if (!isAdmin) return;
-            if (confirm('정말 삭제할까요?')) {
-                promptData = promptData.filter(item => item.id !== id);
-                saveToStorage();
-                renderGallery();
-            }
-        }
-
-        // 업로드 폼 리셋
-        function resetUploadForm() {
-            document.getElementById('inputTitle').value = '';
-            document.getElementById('inputPrompt').value = '';
-            document.getElementById('inputCategory').value = 'fashion';
-            uploadedImage = '';
-            const uploadArea = document.getElementById('imageUpload');
-            uploadArea.innerHTML = `
-                <input type="file" id="imageInput" accept="image/*" hidden onchange="handleImageUpload(event)">
-                <p class="image-upload-text">클릭해서 이미지 업로드<br><span>또는 드래그 앤 드롭</span></p>
-            `;
-            uploadArea.classList.remove('has-image');
-        }
-
-        // 프롬프트 복사
-        function copyPrompt() {
-            navigator.clipboard.writeText(currentPrompt).then(() => {
-                const btn = document.querySelector('.copy-btn');
-                btn.textContent = 'Copied! ✓';
-                btn.classList.add('copied');
-                setTimeout(() => {
-                    btn.textContent = 'Copy Prompt';
-                    btn.classList.remove('copied');
-                }, 2000);
-            });
-        }
-
-        // 초기 렌더링
+        
         renderGallery();
     </script>
-
 </body>
 </html>
