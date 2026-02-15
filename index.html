@@ -25,12 +25,6 @@
         header {
             text-align: center;
             padding: 50px 20px 30px;
-            animation: fadeDown 0.8s ease;
-        }
-
-        @keyframes fadeDown {
-            from { opacity: 0; transform: translateY(-30px); }
-            to { opacity: 1; transform: translateY(0); }
         }
 
         header h1 {
@@ -64,43 +58,38 @@
 
         .search-box {
             position: relative;
-            display: flex;
-            align-items: center;
         }
 
         .search-icon {
             position: absolute;
             left: 20px;
-            font-size: 1.1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1rem;
             opacity: 0.5;
-            z-index: 1;
         }
 
         .search-container input {
             width: 100%;
-            padding: 15px 50px 15px 50px;
+            padding: 15px 50px;
             border: 1px solid #333;
             border-radius: 30px;
             background: #111;
             color: #fff;
             font-size: 1rem;
             font-family: 'Gmarket Sans', sans-serif;
-            transition: all 0.3s ease;
         }
 
         .search-container input:focus {
             outline: none;
             border-color: #666;
-            box-shadow: 0 0 20px rgba(255,255,255,0.1);
-        }
-
-        .search-container input::placeholder {
-            color: #555;
         }
 
         .search-clear {
             position: absolute;
             right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
             background: none;
             border: none;
             color: #555;
@@ -133,12 +122,7 @@
             font-size: 0.85rem;
             cursor: pointer;
             z-index: 1000;
-            transition: all 0.3s ease;
             font-family: 'Gmarket Sans', sans-serif;
-        }
-
-        .admin-btn:hover {
-            background: #333;
         }
 
         .admin-btn.active {
@@ -162,7 +146,6 @@
             background: transparent;
             color: #888;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-family: 'Gmarket Sans', sans-serif;
             font-size: 0.9rem;
         }
@@ -194,23 +177,15 @@
             overflow: hidden;
             cursor: pointer;
             aspect-ratio: 1;
-            animation: cardIn 0.5s ease both;
+            background: #111;
         }
 
-        @keyframes cardIn {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
-        }
-
-        .card img {
+        .card img,
+        .card video,
+        .card iframe {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-
-        .card:hover img {
-            transform: scale(1.1);
         }
 
         .card-overlay {
@@ -221,7 +196,7 @@
             padding: 20px;
             background: linear-gradient(transparent, rgba(0,0,0,0.9));
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.3s;
         }
 
         .card:hover .card-overlay {
@@ -239,6 +214,23 @@
             font-weight: 500;
         }
 
+        .card-desc {
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 5px;
+        }
+
+        .card-type {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 5px 10px;
+            background: rgba(0,0,0,0.7);
+            border-radius: 15px;
+            font-size: 0.7rem;
+            color: #fff;
+        }
+
         .card-delete {
             position: absolute;
             top: 10px;
@@ -252,12 +244,12 @@
             font-size: 1rem;
             cursor: pointer;
             display: none;
-            align-items: center;
-            justify-content: center;
         }
 
         .card-delete.visible {
             display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         /* + 버튼 */
@@ -297,6 +289,7 @@
             justify-content: center;
             z-index: 10000;
             padding: 20px;
+            overflow-y: auto;
         }
 
         .modal.active {
@@ -311,6 +304,7 @@
             max-height: 90vh;
             overflow-y: auto;
             position: relative;
+            padding: 30px;
         }
 
         .modal-close {
@@ -328,16 +322,32 @@
             z-index: 10;
         }
 
+        .modal h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-size: 1.3rem;
+        }
+
         /* 보기 모달 */
         .view-modal .modal-content {
             max-width: 600px;
+            padding: 0;
         }
 
-        .view-modal img {
+        .view-modal .view-media {
             width: 100%;
             aspect-ratio: 1;
-            object-fit: cover;
+            background: #000;
             border-radius: 20px 20px 0 0;
+            overflow: hidden;
+        }
+
+        .view-modal .view-media img,
+        .view-modal .view-media video,
+        .view-modal .view-media iframe {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .view-info {
@@ -352,6 +362,12 @@
 
         .view-title {
             font-size: 1.5rem;
+            margin-bottom: 10px;
+        }
+
+        .view-desc {
+            font-size: 0.9rem;
+            color: #888;
             margin-bottom: 20px;
         }
 
@@ -362,7 +378,19 @@
             font-size: 0.95rem;
             line-height: 1.6;
             color: #ccc;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
+        }
+
+        .view-link {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .view-link a {
+            color: #3498db;
+            word-break: break-all;
         }
 
         .view-actions {
@@ -390,45 +418,7 @@
             color: #fff;
         }
 
-        /* 업로드 모달 */
-        .upload-modal .modal-content,
-        .edit-modal .modal-content {
-            padding: 30px;
-        }
-
-        .modal h2 {
-            text-align: center;
-            margin-bottom: 25px;
-            font-size: 1.3rem;
-        }
-
-        .upload-area {
-            border: 2px dashed #333;
-            border-radius: 15px;
-            padding: 40px;
-            text-align: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .upload-area.has-image {
-            padding: 0;
-            border-style: solid;
-        }
-
-        .upload-area img {
-            width: 100%;
-            aspect-ratio: 1;
-            object-fit: cover;
-            border-radius: 13px;
-        }
-
-        .upload-area p {
-            color: #666;
-        }
-
+        /* 폼 요소 */
         .form-group {
             margin-bottom: 15px;
         }
@@ -454,8 +444,125 @@
         }
 
         .form-group textarea {
-            min-height: 120px;
+            min-height: 100px;
             resize: vertical;
+        }
+
+        .upload-area {
+            border: 2px dashed #333;
+            border-radius: 15px;
+            padding: 40px;
+            text-align: center;
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .upload-area.has-image {
+            padding: 0;
+            border-style: solid;
+        }
+
+        .upload-area img,
+        .upload-area video {
+            width: 100%;
+            aspect-ratio: 1;
+            object-fit: cover;
+            border-radius: 13px;
+        }
+
+        .upload-area p {
+            color: #666;
+        }
+
+        /* 체크박스 그룹 */
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .checkbox-item span {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        /* 카테고리 관리 */
+        .category-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .category-row select {
+            flex: 1;
+        }
+
+        .category-row button {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            border: 1px solid #333;
+            background: #222;
+            color: #fff;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .category-row button:hover {
+            background: #333;
+        }
+
+        .new-category-input {
+            display: none;
+            margin-top: 10px;
+        }
+
+        .new-category-input.visible {
+            display: flex;
+            gap: 10px;
+        }
+
+        .new-category-input input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 10px;
+            background: #1a1a1a;
+            color: #fff;
+            font-family: 'Gmarket Sans', sans-serif;
+        }
+
+        .new-category-input button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 10px;
+            background: #27ae60;
+            color: #fff;
+            cursor: pointer;
+            font-family: 'Gmarket Sans', sans-serif;
+        }
+
+        /* 동적 필드 */
+        .dynamic-field {
+            display: none;
+        }
+
+        .dynamic-field.visible {
+            display: block;
         }
 
         .submit-btn {
@@ -469,12 +576,12 @@
             font-weight: 600;
             cursor: pointer;
             font-family: 'Gmarket Sans', sans-serif;
+            margin-top: 10px;
         }
 
         /* 로그인 모달 */
         .login-modal .modal-content {
             max-width: 350px;
-            padding: 30px;
         }
 
         .login-modal input {
@@ -513,11 +620,6 @@
                 padding: 15px;
             }
 
-            nav {
-                gap: 8px;
-                padding: 15px;
-            }
-
             nav button {
                 padding: 8px 16px;
                 font-size: 0.8rem;
@@ -527,8 +629,11 @@
                 width: 60px;
                 height: 60px;
                 font-size: 2rem;
-                bottom: 20px;
-                right: 20px;
+            }
+
+            .checkbox-group {
+                flex-direction: column;
+                gap: 10px;
             }
         }
 
@@ -548,7 +653,6 @@
         <div class="header-line"></div>
     </header>
 
-    <!-- 검색창 -->
     <div class="search-container">
         <div class="search-box">
             <span class="search-icon">🔍</span>
@@ -558,15 +662,8 @@
         <div class="search-result-count" id="searchResultCount"></div>
     </div>
 
-    <nav>
+    <nav id="filterNav">
         <button class="active" data-filter="all">All</button>
-        <button data-filter="fashion">Fashion</button>
-        <button data-filter="product">Product</button>
-        <button data-filter="concept">Concept Art</button>
-        <button data-filter="photo">Photography</button>
-        <button data-filter="typography">Typography</button>
-        <button data-filter="illustration">Illustration</button>
-        <button data-filter="texture">Texture</button>
     </nav>
 
     <div class="gallery" id="gallery">
@@ -579,11 +676,13 @@
     <div class="modal view-modal" id="viewModal">
         <div class="modal-content">
             <button class="modal-close" id="viewClose">&times;</button>
-            <img src="" alt="" id="viewImage">
+            <div class="view-media" id="viewMedia"></div>
             <div class="view-info">
                 <div class="view-category" id="viewCategory"></div>
                 <h2 class="view-title" id="viewTitle"></h2>
-                <div class="view-prompt" id="viewPrompt"></div>
+                <div class="view-desc" id="viewDesc"></div>
+                <div class="view-prompt" id="viewPrompt" style="display:none;"></div>
+                <div class="view-link" id="viewLink" style="display:none;"></div>
                 <div class="view-actions">
                     <button class="copy-btn" id="copyBtn">📋 Copy</button>
                     <button class="edit-btn" id="editBtn" style="display:none;">✏️ Edit</button>
@@ -596,31 +695,77 @@
     <div class="modal upload-modal" id="uploadModal">
         <div class="modal-content">
             <button class="modal-close" id="uploadClose">&times;</button>
-            <h2>새 프롬프트 추가</h2>
-            <div class="upload-area" id="uploadArea">
-                <p>📷 클릭하거나 이미지를 드래그하세요</p>
+            <h2>새 콘텐츠 추가</h2>
+            
+            <!-- 콘텐츠 타입 -->
+            <div class="form-group">
+                <label>콘텐츠 타입</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="typePrompt" checked>
+                        <span>📝 프롬프트</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="typeLink">
+                        <span>🔗 링크</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="typeVideo">
+                        <span>🎬 동영상</span>
+                    </label>
+                </div>
             </div>
-            <input type="file" id="fileInput" accept="image/*" style="display:none;">
+
+            <!-- 이미지/동영상 업로드 -->
+            <div class="upload-area" id="uploadArea">
+                <p>📷 클릭하거나 이미지/동영상을 드래그하세요</p>
+            </div>
+            <input type="file" id="fileInput" accept="image/*,video/*" style="display:none;">
+
+            <!-- 동영상 URL -->
+            <div class="form-group dynamic-field" id="videoUrlField">
+                <label>동영상 URL (YouTube, Vimeo 등)</label>
+                <input type="text" id="uploadVideoUrl" placeholder="https://youtube.com/watch?v=...">
+            </div>
+
+            <!-- 카테고리 -->
             <div class="form-group">
                 <label>카테고리</label>
-                <select id="uploadCategory">
-                    <option value="fashion">Fashion</option>
-                    <option value="product">Product</option>
-                    <option value="concept">Concept Art</option>
-                    <option value="photo">Photography</option>
-                    <option value="typography">Typography</option>
-                    <option value="illustration">Illustration</option>
-                    <option value="texture">Texture</option>
-                </select>
+                <div class="category-row">
+                    <select id="uploadCategory"></select>
+                    <button id="addCategoryBtn" title="카테고리 추가">+</button>
+                    <button id="delCategoryBtn" title="카테고리 삭제">−</button>
+                </div>
+                <div class="new-category-input" id="newCategoryInput">
+                    <input type="text" id="newCategoryName" placeholder="새 카테고리 이름">
+                    <button id="saveCategoryBtn">추가</button>
+                </div>
             </div>
+
+            <!-- 제목 -->
             <div class="form-group">
                 <label>제목</label>
-                <input type="text" id="uploadTitle" placeholder="프롬프트 제목">
+                <input type="text" id="uploadTitle" placeholder="제목을 입력하세요">
             </div>
+
+            <!-- 설명 (선택) -->
             <div class="form-group">
+                <label>설명 (선택)</label>
+                <input type="text" id="uploadDesc" placeholder="간단한 설명 (선택사항)">
+            </div>
+
+            <!-- 프롬프트 -->
+            <div class="form-group dynamic-field visible" id="promptField">
                 <label>프롬프트</label>
                 <textarea id="uploadPrompt" placeholder="프롬프트 내용을 입력하세요..."></textarea>
             </div>
+
+            <!-- 링크 -->
+            <div class="form-group dynamic-field" id="linkField">
+                <label>링크 URL</label>
+                <input type="text" id="uploadLink" placeholder="https://...">
+            </div>
+
             <button class="submit-btn" id="submitBtn">저장하기</button>
         </div>
     </div>
@@ -629,31 +774,61 @@
     <div class="modal edit-modal" id="editModal">
         <div class="modal-content">
             <button class="modal-close" id="editClose">&times;</button>
-            <h2>프롬프트 수정</h2>
-            <div class="upload-area" id="editArea">
-                <p>📷 클릭하거나 이미지를 드래그하세요</p>
+            <h2>콘텐츠 수정</h2>
+            
+            <div class="form-group">
+                <label>콘텐츠 타입</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="editTypePrompt">
+                        <span>📝 프롬프트</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="editTypeLink">
+                        <span>🔗 링크</span>
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox" id="editTypeVideo">
+                        <span>🎬 동영상</span>
+                    </label>
+                </div>
             </div>
-            <input type="file" id="editFileInput" accept="image/*" style="display:none;">
+
+            <div class="upload-area" id="editArea">
+                <p>📷 클릭하거나 이미지/동영상을 드래그하세요</p>
+            </div>
+            <input type="file" id="editFileInput" accept="image/*,video/*" style="display:none;">
+
+            <div class="form-group dynamic-field" id="editVideoUrlField">
+                <label>동영상 URL</label>
+                <input type="text" id="editVideoUrl" placeholder="https://youtube.com/watch?v=...">
+            </div>
+
             <div class="form-group">
                 <label>카테고리</label>
-                <select id="editCategory">
-                    <option value="fashion">Fashion</option>
-                    <option value="product">Product</option>
-                    <option value="concept">Concept Art</option>
-                    <option value="photo">Photography</option>
-                    <option value="typography">Typography</option>
-                    <option value="illustration">Illustration</option>
-                    <option value="texture">Texture</option>
-                </select>
+                <select id="editCategory"></select>
             </div>
+
             <div class="form-group">
                 <label>제목</label>
-                <input type="text" id="editTitle" placeholder="프롬프트 제목">
+                <input type="text" id="editTitle" placeholder="제목을 입력하세요">
             </div>
+
             <div class="form-group">
+                <label>설명 (선택)</label>
+                <input type="text" id="editDesc" placeholder="간단한 설명 (선택사항)">
+            </div>
+
+            <div class="form-group dynamic-field" id="editPromptField">
                 <label>프롬프트</label>
                 <textarea id="editPromptText" placeholder="프롬프트 내용을 입력하세요..."></textarea>
             </div>
+
+            <div class="form-group dynamic-field" id="editLinkField">
+                <label>링크 URL</label>
+                <input type="text" id="editLink" placeholder="https://...">
+            </div>
+
             <button class="submit-btn" id="updateBtn">수정하기</button>
         </div>
     </div>
@@ -688,24 +863,70 @@
         let currentFilter = 'all';
         let currentEditId = null;
         let uploadedFile = null;
+        let categories = ['Fashion', 'Product', 'Concept Art', 'Photography', 'Typography', 'Illustration', 'Texture'];
 
-        const categoryNames = {
-            fashion: 'Fashion',
-            product: 'Product',
-            concept: 'Concept Art',
-            photo: 'Photography',
-            typography: 'Typography',
-            illustration: 'Illustration',
-            texture: 'Texture'
-        };
+        // 카테고리 로드
+        async function loadCategories() {
+            try {
+                const doc = await db.collection('settings').doc('categories').get();
+                if (doc.exists && doc.data().list) {
+                    categories = doc.data().list;
+                }
+            } catch (e) {
+                console.log('Using default categories');
+            }
+            renderCategories();
+            renderFilterNav();
+        }
 
-        const gallery = document.getElementById('gallery');
-        const searchInput = document.getElementById('searchInput');
-        const searchClear = document.getElementById('searchClear');
-        const searchResultCount = document.getElementById('searchResultCount');
+        // 카테고리 저장
+        async function saveCategories() {
+            await db.collection('settings').doc('categories').set({ list: categories });
+            renderCategories();
+            renderFilterNav();
+        }
+
+        // 카테고리 렌더링
+        function renderCategories() {
+            const options = categories.map(c => `<option value="${c}">${c}</option>`).join('');
+            document.getElementById('uploadCategory').innerHTML = options;
+            document.getElementById('editCategory').innerHTML = options;
+        }
+
+        // 필터 네비게이션 렌더링
+        function renderFilterNav() {
+            const nav = document.getElementById('filterNav');
+            nav.innerHTML = `<button class="${currentFilter === 'all' ? 'active' : ''}" data-filter="all">All</button>` +
+                categories.map(c => `<button class="${currentFilter === c ? 'active' : ''}" data-filter="${c}">${c}</button>`).join('');
+            
+            nav.querySelectorAll('button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    nav.querySelector('.active').classList.remove('active');
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    renderGallery(document.getElementById('searchInput').value);
+                });
+            });
+        }
+
+        // YouTube URL을 임베드 URL로 변환
+        function getEmbedUrl(url) {
+            if (!url) return null;
+            
+            // YouTube
+            const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([^&\s]+)/);
+            if (ytMatch) return `https://www.youtube.com/embed/${ytMatch[1]}`;
+            
+            // Vimeo
+            const vimeoMatch = url.match(/vimeo\.com\/(\d+)/);
+            if (vimeoMatch) return `https://player.vimeo.com/video/${vimeoMatch[1]}`;
+            
+            return url;
+        }
 
         // 갤러리 렌더링
         async function renderGallery(searchQuery = '') {
+            const gallery = document.getElementById('gallery');
             gallery.innerHTML = '<div class="loading">Loading...</div>';
             
             try {
@@ -717,31 +938,49 @@
                 }
                 
                 if (searchQuery) {
-                    const query = searchQuery.toLowerCase();
+                    const q = searchQuery.toLowerCase();
                     prompts = prompts.filter(p => 
-                        p.title?.toLowerCase().includes(query) ||
-                        p.prompt?.toLowerCase().includes(query) ||
-                        categoryNames[p.category]?.toLowerCase().includes(query)
+                        p.title?.toLowerCase().includes(q) ||
+                        p.prompt?.toLowerCase().includes(q) ||
+                        p.description?.toLowerCase().includes(q) ||
+                        p.category?.toLowerCase().includes(q)
                     );
                 }
                 
-                searchResultCount.textContent = searchQuery ? `${prompts.length}개 결과` : '';
+                document.getElementById('searchResultCount').textContent = searchQuery ? `${prompts.length}개 결과` : '';
                 
                 if (prompts.length === 0) {
-                    gallery.innerHTML = '<div class="empty-state"><p>프롬프트가 없습니다</p></div>';
+                    gallery.innerHTML = '<div class="empty-state"><p>콘텐츠가 없습니다</p></div>';
                     return;
                 }
                 
-                gallery.innerHTML = prompts.map((item, index) => `
-                    <div class="card" data-id="${item.id}" style="animation-delay: ${index * 0.05}s">
-                        <img src="${item.image}" alt="${item.title}">
-                        <div class="card-overlay">
-                            <div class="card-category">${categoryNames[item.category] || item.category}</div>
-                            <div class="card-title">${item.title}</div>
+                gallery.innerHTML = prompts.map(item => {
+                    const types = [];
+                    if (item.hasPrompt) types.push('📝');
+                    if (item.hasLink) types.push('🔗');
+                    if (item.hasVideo) types.push('🎬');
+                    
+                    let mediaHtml = '';
+                    if (item.videoUrl) {
+                        const embedUrl = getEmbedUrl(item.videoUrl);
+                        mediaHtml = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
+                    } else if (item.image) {
+                        mediaHtml = `<img src="${item.image}" alt="${item.title}">`;
+                    }
+                    
+                    return `
+                        <div class="card" data-id="${item.id}">
+                            ${mediaHtml}
+                            <div class="card-type">${types.join(' ')}</div>
+                            <div class="card-overlay">
+                                <div class="card-category">${item.category}</div>
+                                <div class="card-title">${item.title}</div>
+                                ${item.description ? `<div class="card-desc">${item.description}</div>` : ''}
+                            </div>
+                            <button class="card-delete ${isAdmin ? 'visible' : ''}" data-id="${item.id}">&times;</button>
                         </div>
-                        <button class="card-delete ${isAdmin ? 'visible' : ''}" data-id="${item.id}">&times;</button>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 
                 document.querySelectorAll('.card').forEach(card => {
                     card.addEventListener('click', (e) => {
@@ -771,11 +1010,39 @@
                 if (!doc.exists) return;
                 
                 const data = doc.data();
-                document.getElementById('viewImage').src = data.image;
-                document.getElementById('viewCategory').textContent = categoryNames[data.category] || data.category;
+                const viewMedia = document.getElementById('viewMedia');
+                
+                if (data.videoUrl) {
+                    const embedUrl = getEmbedUrl(data.videoUrl);
+                    viewMedia.innerHTML = `<iframe src="${embedUrl}" frameborder="0" allowfullscreen></iframe>`;
+                } else if (data.image) {
+                    viewMedia.innerHTML = `<img src="${data.image}" alt="${data.title}">`;
+                }
+                
+                document.getElementById('viewCategory').textContent = data.category;
                 document.getElementById('viewTitle').textContent = data.title;
-                document.getElementById('viewPrompt').textContent = data.prompt;
+                document.getElementById('viewDesc').textContent = data.description || '';
+                document.getElementById('viewDesc').style.display = data.description ? 'block' : 'none';
+                
+                const viewPrompt = document.getElementById('viewPrompt');
+                const viewLink = document.getElementById('viewLink');
+                
+                if (data.hasPrompt && data.prompt) {
+                    viewPrompt.textContent = data.prompt;
+                    viewPrompt.style.display = 'block';
+                } else {
+                    viewPrompt.style.display = 'none';
+                }
+                
+                if (data.hasLink && data.link) {
+                    viewLink.innerHTML = `<a href="${data.link}" target="_blank">${data.link}</a>`;
+                    viewLink.style.display = 'block';
+                } else {
+                    viewLink.style.display = 'none';
+                }
+                
                 document.getElementById('editBtn').style.display = isAdmin ? 'block' : 'none';
+                document.getElementById('copyBtn').style.display = data.hasPrompt ? 'block' : 'none';
                 
                 currentEditId = id;
                 document.getElementById('viewModal').classList.add('active');
@@ -787,12 +1054,10 @@
         // 삭제
         async function deletePrompt(id) {
             if (!confirm('정말 삭제하시겠습니까?')) return;
-            
             try {
                 await db.collection('prompts').doc(id).delete();
-                renderGallery(searchInput.value);
+                renderGallery(document.getElementById('searchInput').value);
             } catch (error) {
-                console.error('Error:', error);
                 alert('삭제 실패!');
             }
         }
@@ -807,32 +1072,53 @@
 
         // 저장
         async function savePrompt() {
+            const hasPrompt = document.getElementById('typePrompt').checked;
+            const hasLink = document.getElementById('typeLink').checked;
+            const hasVideo = document.getElementById('typeVideo').checked;
+            
             const category = document.getElementById('uploadCategory').value;
             const title = document.getElementById('uploadTitle').value.trim();
+            const description = document.getElementById('uploadDesc').value.trim();
             const prompt = document.getElementById('uploadPrompt').value.trim();
+            const link = document.getElementById('uploadLink').value.trim();
+            const videoUrl = document.getElementById('uploadVideoUrl').value.trim();
             
-            if (!uploadedFile || !title || !prompt) {
-                alert('모든 필드를 입력해주세요!');
+            if (!title) {
+                alert('제목을 입력해주세요!');
                 return;
             }
             
             try {
-                document.getElementById('submitBtn').textContent = '업로드 중...';
-                const imageUrl = await uploadImage(uploadedFile);
+                document.getElementById('submitBtn').textContent = '저장 중...';
+                
+                let imageUrl = '';
+                if (uploadedFile) {
+                    imageUrl = await uploadImage(uploadedFile);
+                }
                 
                 await db.collection('prompts').add({
                     category,
                     title,
-                    prompt,
+                    description,
+                    prompt: hasPrompt ? prompt : '',
+                    link: hasLink ? link : '',
+                    videoUrl: hasVideo ? videoUrl : '',
                     image: imageUrl,
+                    hasPrompt,
+                    hasLink,
+                    hasVideo,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
+                // 초기화
                 uploadedFile = null;
-                document.getElementById('uploadArea').innerHTML = '<p>📷 클릭하거나 이미지를 드래그하세요</p>';
+                document.getElementById('uploadArea').innerHTML = '<p>📷 클릭하거나 이미지/동영상을 드래그하세요</p>';
                 document.getElementById('uploadArea').classList.remove('has-image');
                 document.getElementById('uploadTitle').value = '';
+                document.getElementById('uploadDesc').value = '';
                 document.getElementById('uploadPrompt').value = '';
+                document.getElementById('uploadLink').value = '';
+                document.getElementById('uploadVideoUrl').value = '';
                 document.getElementById('submitBtn').textContent = '저장하기';
                 
                 document.getElementById('uploadModal').classList.remove('active');
@@ -849,18 +1135,36 @@
         async function updatePrompt() {
             if (!currentEditId) return;
             
+            const hasPrompt = document.getElementById('editTypePrompt').checked;
+            const hasLink = document.getElementById('editTypeLink').checked;
+            const hasVideo = document.getElementById('editTypeVideo').checked;
+            
             const category = document.getElementById('editCategory').value;
             const title = document.getElementById('editTitle').value.trim();
+            const description = document.getElementById('editDesc').value.trim();
             const prompt = document.getElementById('editPromptText').value.trim();
+            const link = document.getElementById('editLink').value.trim();
+            const videoUrl = document.getElementById('editVideoUrl').value.trim();
             
-            if (!title || !prompt) {
-                alert('모든 필드를 입력해주세요!');
+            if (!title) {
+                alert('제목을 입력해주세요!');
                 return;
             }
             
             try {
                 document.getElementById('updateBtn').textContent = '수정 중...';
-                const updateData = { category, title, prompt };
+                
+                const updateData = {
+                    category,
+                    title,
+                    description,
+                    prompt: hasPrompt ? prompt : '',
+                    link: hasLink ? link : '',
+                    videoUrl: hasVideo ? videoUrl : '',
+                    hasPrompt,
+                    hasLink,
+                    hasVideo
+                };
                 
                 if (uploadedFile) {
                     updateData.image = await uploadImage(uploadedFile);
@@ -872,7 +1176,7 @@
                 document.getElementById('editModal').classList.remove('active');
                 document.getElementById('viewModal').classList.remove('active');
                 document.getElementById('updateBtn').textContent = '수정하기';
-                renderGallery(searchInput.value);
+                renderGallery(document.getElementById('searchInput').value);
                 alert('수정 완료!');
             } catch (error) {
                 console.error('Error:', error);
@@ -890,13 +1194,25 @@
                 if (!doc.exists) return;
                 
                 const data = doc.data();
+                
+                document.getElementById('editTypePrompt').checked = data.hasPrompt || false;
+                document.getElementById('editTypeLink').checked = data.hasLink || false;
+                document.getElementById('editTypeVideo').checked = data.hasVideo || false;
+                
                 document.getElementById('editCategory').value = data.category;
                 document.getElementById('editTitle').value = data.title;
-                document.getElementById('editPromptText').value = data.prompt;
+                document.getElementById('editDesc').value = data.description || '';
+                document.getElementById('editPromptText').value = data.prompt || '';
+                document.getElementById('editLink').value = data.link || '';
+                document.getElementById('editVideoUrl').value = data.videoUrl || '';
                 
                 const editArea = document.getElementById('editArea');
-                editArea.innerHTML = `<img src="${data.image}" alt="preview">`;
-                editArea.classList.add('has-image');
+                if (data.image) {
+                    editArea.innerHTML = `<img src="${data.image}" alt="preview">`;
+                    editArea.classList.add('has-image');
+                }
+                
+                updateEditFields();
                 
                 document.getElementById('viewModal').classList.remove('active');
                 document.getElementById('editModal').classList.add('active');
@@ -905,14 +1221,39 @@
             }
         }
 
+        // 동적 필드 업데이트
+        function updateUploadFields() {
+            const hasPrompt = document.getElementById('typePrompt').checked;
+            const hasLink = document.getElementById('typeLink').checked;
+            const hasVideo = document.getElementById('typeVideo').checked;
+            
+            document.getElementById('promptField').classList.toggle('visible', hasPrompt);
+            document.getElementById('linkField').classList.toggle('visible', hasLink);
+            document.getElementById('videoUrlField').classList.toggle('visible', hasVideo);
+        }
+
+        function updateEditFields() {
+            const hasPrompt = document.getElementById('editTypePrompt').checked;
+            const hasLink = document.getElementById('editTypeLink').checked;
+            const hasVideo = document.getElementById('editTypeVideo').checked;
+            
+            document.getElementById('editPromptField').classList.toggle('visible', hasPrompt);
+            document.getElementById('editLinkField').classList.toggle('visible', hasLink);
+            document.getElementById('editVideoUrlField').classList.toggle('visible', hasVideo);
+        }
+
         // 이미지 미리보기
         function handleImagePreview(file, targetArea) {
-            if (!file || !file.type.startsWith('image/')) return;
+            if (!file) return;
             
             uploadedFile = file;
             const reader = new FileReader();
             reader.onload = (e) => {
-                targetArea.innerHTML = `<img src="${e.target.result}" alt="preview">`;
+                if (file.type.startsWith('video/')) {
+                    targetArea.innerHTML = `<video src="${e.target.result}" controls></video>`;
+                } else {
+                    targetArea.innerHTML = `<img src="${e.target.result}" alt="preview">`;
+                }
                 targetArea.classList.add('has-image');
             };
             reader.readAsDataURL(file);
@@ -920,8 +1261,8 @@
 
         // 검색
         function handleSearch() {
-            const query = searchInput.value.trim();
-            searchClear.classList.toggle('visible', query.length > 0);
+            const query = document.getElementById('searchInput').value.trim();
+            document.getElementById('searchClear').classList.toggle('visible', query.length > 0);
             renderGallery(query);
         }
 
@@ -932,51 +1273,43 @@
                 document.getElementById('adminBtn').classList.remove('active');
                 document.getElementById('adminBtn').textContent = 'Admin';
                 document.getElementById('addBtn').classList.remove('visible');
-                renderGallery(searchInput.value);
+                renderGallery(document.getElementById('searchInput').value);
             } else {
                 document.getElementById('loginModal').classList.add('active');
             }
         }
 
         function handleLogin() {
-            const password = document.getElementById('passwordInput').value;
-            if (password === ADMIN_PASSWORD) {
+            if (document.getElementById('passwordInput').value === ADMIN_PASSWORD) {
                 isAdmin = true;
                 document.getElementById('adminBtn').classList.add('active');
                 document.getElementById('adminBtn').textContent = 'Logout';
                 document.getElementById('addBtn').classList.add('visible');
                 document.getElementById('loginModal').classList.remove('active');
                 document.getElementById('passwordInput').value = '';
-                renderGallery(searchInput.value);
+                renderGallery(document.getElementById('searchInput').value);
             } else {
                 alert('비밀번호가 틀렸습니다!');
             }
         }
 
-        // 이벤트
+        // 이벤트 리스너
         document.getElementById('adminBtn').addEventListener('click', toggleAdmin);
         document.getElementById('addBtn').addEventListener('click', () => document.getElementById('uploadModal').classList.add('active'));
         
-        searchInput.addEventListener('input', handleSearch);
-        searchClear.addEventListener('click', () => {
-            searchInput.value = '';
+        document.getElementById('searchInput').addEventListener('input', handleSearch);
+        document.getElementById('searchClear').addEventListener('click', () => {
+            document.getElementById('searchInput').value = '';
             handleSearch();
         });
         
-        document.querySelectorAll('nav button').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelector('nav button.active').classList.remove('active');
-                btn.classList.add('active');
-                currentFilter = btn.dataset.filter;
-                renderGallery(searchInput.value);
-            });
-        });
-        
+        // 모달 닫기
         document.getElementById('viewClose').addEventListener('click', () => document.getElementById('viewModal').classList.remove('active'));
         document.getElementById('uploadClose').addEventListener('click', () => document.getElementById('uploadModal').classList.remove('active'));
         document.getElementById('editClose').addEventListener('click', () => document.getElementById('editModal').classList.remove('active'));
         document.getElementById('loginClose').addEventListener('click', () => document.getElementById('loginModal').classList.remove('active'));
         
+        // 복사
         document.getElementById('copyBtn').addEventListener('click', () => {
             navigator.clipboard.writeText(document.getElementById('viewPrompt').textContent);
             alert('복사 완료!');
@@ -984,6 +1317,40 @@
         
         document.getElementById('editBtn').addEventListener('click', openEditModal);
         
+        // 체크박스 이벤트
+        document.getElementById('typePrompt').addEventListener('change', updateUploadFields);
+        document.getElementById('typeLink').addEventListener('change', updateUploadFields);
+        document.getElementById('typeVideo').addEventListener('change', updateUploadFields);
+        document.getElementById('editTypePrompt').addEventListener('change', updateEditFields);
+        document.getElementById('editTypeLink').addEventListener('change', updateEditFields);
+        document.getElementById('editTypeVideo').addEventListener('change', updateEditFields);
+        
+        // 카테고리 관리
+        document.getElementById('addCategoryBtn').addEventListener('click', () => {
+            document.getElementById('newCategoryInput').classList.toggle('visible');
+        });
+        
+        document.getElementById('saveCategoryBtn').addEventListener('click', async () => {
+            const name = document.getElementById('newCategoryName').value.trim();
+            if (name && !categories.includes(name)) {
+                categories.push(name);
+                await saveCategories();
+                document.getElementById('newCategoryName').value = '';
+                document.getElementById('newCategoryInput').classList.remove('visible');
+                alert('카테고리 추가됨!');
+            }
+        });
+        
+        document.getElementById('delCategoryBtn').addEventListener('click', async () => {
+            const selected = document.getElementById('uploadCategory').value;
+            if (confirm(`"${selected}" 카테고리를 삭제하시겠습니까?`)) {
+                categories = categories.filter(c => c !== selected);
+                await saveCategories();
+                alert('카테고리 삭제됨!');
+            }
+        });
+        
+        // 파일 업로드
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
         
@@ -1006,6 +1373,7 @@
         });
         editFileInput.addEventListener('change', (e) => handleImagePreview(e.target.files[0], editArea));
         
+        // 저장/수정/로그인
         document.getElementById('submitBtn').addEventListener('click', savePrompt);
         document.getElementById('updateBtn').addEventListener('click', updatePrompt);
         document.getElementById('loginBtn').addEventListener('click', handleLogin);
@@ -1013,6 +1381,8 @@
             if (e.key === 'Enter') handleLogin();
         });
         
+        // 초기화
+        loadCategories();
         renderGallery();
     </script>
 </body>
